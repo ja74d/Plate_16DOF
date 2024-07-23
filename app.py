@@ -75,8 +75,8 @@ for k in range(0, len(N)):
     #print(secon_diffN)
     second_diffN_xy.append(secon_diffNxy)
 second_diffN_xy = np.array(second_diffN_xy)
-print(second_diffN_xy[0])
-print(sp.diff((sp.diff(N[0], x)), y))
+#print(second_diffN_xy[0])
+#print(sp.diff((sp.diff(N[0], x)), y))
 
 d = E*h**3/(12*(1-nu**2))
 D = d*np.array([[1, nu, 0], [nu, 1, 0], [0, 0, (1-nu)/2]])
@@ -84,7 +84,7 @@ D = d*np.array([[1, nu, 0], [nu, 1, 0], [0, 0, (1-nu)/2]])
 #B = np.array([second_diffN_x[0], second_diffN_y[0], second_diffN_xy[0]])
 B = []
 for l in range(len(N)):
-    BB = np.array([-second_diffN_x[l], -second_diffN_y[l], -2*second_diffN_xy[l]])
+    BB = np.array([-1*second_diffN_x[l], -1*second_diffN_y[l], -2*second_diffN_xy[l]])
     B.append(BB)
 #B = np.array([B])
 
@@ -93,8 +93,9 @@ k11 = sp.integrate(sp.integrate(fk11, (x, 0, a)), (y, 0, b))
 print(k11)
 #print(B[0])
 
-B_ = np.array([-sp.diff(sp.diff(N[0], x), x), -sp.diff(sp.diff(N[0], y), y), -2*sp.diff(sp.diff(N[0], y), x)])
+#B_ = np.array([-sp.diff(sp.diff(N[0], x), x), -sp.diff(sp.diff(N[0], y), y), -2*sp.diff(sp.diff(N[0], y), x)])
 #print(B)
 
-print(sp.integrate(sp.integrate(B_.T@D@B_, (x, 0, a)), (y, 0, b)))
+#print(sp.integrate(sp.integrate(B_.T@D@B_, (x, 0, a)), (y, 0, b)))
 
+#F matrix
