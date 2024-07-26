@@ -6,7 +6,7 @@ x, y = sp.symbols('x y')
 #, h = sp.symbols('E h')
 a1, a2, a3, a4, a5, a6, a7, a8, a9 = sp.symbols('a1 a2 a3 a4 a5 a6 a7 a8 a9')
 # = sp.symbols('a')
-a = 8
+a = 2
 b = a
 nu = 0.3
 E = 1
@@ -23,7 +23,7 @@ Nx1 = 1-3*(x/a)**2 + 2*(x/a)**3
 Ny1 = 1-3*(y/b)**2 + 2*(y/b)**3
 
 Nx2 = a*((x/a) -2*(x/a)**2 + (x/a)**3)
-Ny2 = Nx2 = b*((y/b) -2*(y/b)**2 + (y/b)**3)
+Ny2 = b*((y/b) -2*(y/b)**2 + (y/b)**3)
 
 Nx3 = 3*(x/a)**2 - 2*(x/a)**3
 Ny3 = 3*(y/b)**2 - 2*(y/b)**3
@@ -88,7 +88,7 @@ for l in range(len(N)):
     B.append(BB)
 #B = np.array([B])
 
-fk11 = B[0].T@D@B[0]
+fk11 = B[15].T@D@B[15] 
 k11 = sp.integrate(sp.integrate(fk11, (x, 0, a)), (y, 0, b))
 print(k11)
 #print(B[0])
@@ -99,3 +99,9 @@ print(k11)
 #print(sp.integrate(sp.integrate(B_.T@D@B_, (x, 0, a)), (y, 0, b)))
 
 #F matrix
+
+#p0 = np.array([[25], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]])
+
+p0 = 1
+F = sp.integrate(sp.integrate(N[0], (x, 0, a)), (y, 0, b))
+print(F)
