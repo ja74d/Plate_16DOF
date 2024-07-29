@@ -6,8 +6,8 @@ x, y = sp.symbols('x y')
 #, h = sp.symbols('E h')
 a1, a2, a3, a4, a5, a6, a7, a8, a9 = sp.symbols('a1 a2 a3 a4 a5 a6 a7 a8 a9')
 # = sp.symbols('a')
-a = 2
-b = a
+a = 4
+b = 6
 nu = 0.3
 E = 1
 h = 1
@@ -87,21 +87,44 @@ for l in range(len(N)):
     BB = np.array([-1*second_diffN_x[l], -1*second_diffN_y[l], -2*second_diffN_xy[l]])
     B.append(BB)
 #B = np.array([B])
+def K(r, s):
+    s = int(s)
+    r = int(r)
+    fk11 = B[r].T@D@B[s] 
+    k = sp.integrate(sp.integrate(fk11, (x, 0, a)), (y, 0, b))
+    #print(k11)
+    return k
 
-fk11 = B[15].T@D@B[15] 
-k11 = sp.integrate(sp.integrate(fk11, (x, 0, a)), (y, 0, b))
-print(k11)
-#print(B[0])
+print(K(0, 0))
 
-#B_ = np.array([-sp.diff(sp.diff(N[0], x), x), -sp.diff(sp.diff(N[0], y), y), -2*sp.diff(sp.diff(N[0], y), x)])
-#print(B)
+K_e = np.zeros([16, 16])
 
-#print(sp.integrate(sp.integrate(B_.T@D@B_, (x, 0, a)), (y, 0, b)))
+for o in range(0, 16):
+    for p in range(0, 16):
+       K_e[o, p] = K(o, p)
+#print(K_e)
+
 
 #F matrix
 
-#p0 = np.array([[25], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]])
+p0 = np.array([[25], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]])
 
-p0 = 1
-F = sp.integrate(sp.integrate(N[0], (x, 0, a)), (y, 0, b))
-print(F)
+#F_e = np.zeros((16, 1))
+#F = []
+
+#p0 = 1
+#for bb in range(0, 16):
+#    N = N.T
+#    #NN = sp.diff(N[bb], y)
+#    f = sp.integrate(sp.integrate(p0*N[bb], (x, 0, a)), (y, 0, b))
+#    F.append(f)
+#
+#for m in range(0, 16):
+#    F_e[m, 0] = F[m]
+#
+#print(F_e)
+
+#print((K_e**-1)@F_e)
+print((K_e**-1)@p0)
+#F_ee = (p0*a*b)*np.array([1/4, a/24, b/24, (a*b)/14, 1/4, -a/24, b/24, -(a*b)/144, 1/4, -a/24, -b/24, (a*b)/144, 1/4, a/24, -b/24, -(a*b)/144])
+#print(F_ee)
