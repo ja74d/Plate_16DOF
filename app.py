@@ -6,8 +6,15 @@ x, y = sp.symbols('x y')
 #, h = sp.symbols('E h')
 a1, a2, a3, a4, a5, a6, a7, a8, a9 = sp.symbols('a1 a2 a3 a4 a5 a6 a7 a8 a9')
 # = sp.symbols('a')
-a = 2
-b = a
+
+Lx = 8
+Ly = 8
+
+Nex = 4
+Ney = 4
+
+a = Lx/Nex
+b = Ly/Ney
 nu = 0.3
 E = 1
 h = 1
@@ -95,9 +102,35 @@ def K(r, s):
     #print(k11)
     return k
 
+ww = [ 0.568889, 0.478629, 0.478629, 0.236927, 0.236927 ]
+xx = [ 0, 0.538469, -0.538469, 0.90618, -0.90618 ]
+
 print(K(0, 0))
 
 K_e = np.zeros([16, 16])
+
+#k11 = 0
+# Loop through integration points
+for ii in range(0, 16):
+    for jj in range(0, 16):
+        fun = B[ii].T @ D @ B[jj]
+        ke=0
+        for l1 in range(0, 5):
+            for l2 in range(0, 5):
+                x1 = 0.5*xx[l1]*a + 0.5*a
+                y1 = 0.5*xx[l2]*b + 0.5*b
+
+                # Apply the substitution and evaluate the expression
+                fun_evaluated = fun.subs({x: x1, y: y1}).evalf()
+
+                # Now use the evaluated value in your calculation
+                ke += (a*b/4) * ww[l1] * ww[l2] * fun_evaluated
+                K_e[ii, jj] = ke
+print(K_e)
+        
+
+
+
 
 for o in range(0, 16):
     for p in range(0, 16):
