@@ -20,4 +20,4 @@ function [d ,w] = GaussQuad(n, s0, s1)
   d=s0+0.5*(s1-s0)*(d+1);
 end
 
-[d, w] = GaussQuad(4)
+[d, w] = GaussQuad(4);
