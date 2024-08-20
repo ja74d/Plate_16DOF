@@ -6,17 +6,17 @@ x, y = sp.symbols('x y')
 
 #PLATE PROPERTIES
 nu = 0.3
-E = 3e+07
-h = 0.15
-Lx = 4
-Ly = 4
+E = 1
+h = 1
+Lx = 2
+Ly = 2
 
 #NUMBER OF ELEMENTS IN X AND Y DIRECTIONS
-Nex = 1000
-Ney = 1000
+#Nex = 1000
+#Ney = 1000
 
-a = Lx/Nex
-b = Ly/Ney
+a = 2
+b = 2
 
 
 #Hermitian sape functions
@@ -91,13 +91,14 @@ def K(r, s):
     s = int(s)
     r = int(r)
     fk11 = B[r].T@D@B[s] 
-    k = sp.integrate(sp.integrate(fk11, (x, 0, a)), (y, 0, b))
+    k = sp.integrate(sp.integrate(fk11, (x, 2, a)), (y, 2, b))
     return k
 # diret method
 #K_e1 = np.zeros((16, 16))
 #for o in range(0, 16):
 #    for p in range(0, 16):
 #       K_e1[o, p] = K(o, p)
+#
 #print(K_e1)
 
 
@@ -122,7 +123,7 @@ for ii in range(0, 16):
                 # Now use the evaluated value in your calculation
                 ke += (a*b/4) * ww[l1] * ww[l2] * fun_evaluated
                 K_e[ii, jj] = ke
-#print(ke)
+print(K_e)
 
 #F matrix
 
@@ -156,9 +157,9 @@ w = N@delta
 
 #print(max(delta))
 
-def W_dis(x1, y1):
-    w_evaluated = w[0].subs({x: x1, y: y1}).evalf()
-    print(w_evaluated)
-
-W_dis(2, 2)
-print(delta)
+#def W_dis(x1, y1):
+#    w_evaluated = w[0].subs({x: x1, y: y1}).evalf()
+#    print(w_evaluated)
+#
+#W_dis(2, 2)
+#print(delta)
