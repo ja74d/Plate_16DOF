@@ -1,7 +1,7 @@
 clear all
 clc
-Lx=8; Ly=8; h=1; E=10.92; nu=0.3;
-Nex=4; Ney=4; %number of elements in x and y directions
+Lx=4; Ly=4; h=1; E=10.92; nu=0.3;
+Nex=2; Ney=2; %number of elements in x and y directions
 p0=1; ro=7.85;
 BCleft='S'; BCtop='S'; BCright='S'; BCbottom='S';
 %---------------------------SHAPE FUNCTIONS--------------------------------
@@ -196,18 +196,8 @@ for elem = 1:num_elements
         end
     end
 end
-%-------------------------SOLVING DEFORMATION PROBLEM----------------------
-Delta = inv(K)*F
-midelem=fix(Ney/2)*Nex+fix(Nex/2)+1;
-corXmid=(Nex/2-fix(Nex/2))*a; corYmid=(Ney/2-fix(Ney/2))*b;
-Wmid=0;
-for i=1:16
-    if code(midelem, i)~=0
-        Wmid=Wmid+double(subs(subs(N(i)* ...
-            Delta(code(midelem,i)),x,corXmid),y,corYmid));
-    end
-end
-wmidND=Wmid/(p0*Lx^4/d)
+%-------------------------SOLVING DEFORMATION P
+disp(inv(K)*F)
 
 
 
