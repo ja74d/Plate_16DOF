@@ -4,16 +4,21 @@ import sympy as sp
 #SYMBOLES
 x, y = sp.symbols('x y')
 
+BCleft, BCright, BCtop, BCbottom = 'S', 'S', 'S', 'S'
+
 #PLATE PROPERTIES
 nu = 0.3
 E = 1
 h = 1
-Lx = 2
-Ly = 2
+Lx = 4
+Ly = 4
+
+a = 2
+b = 2
 
 #NUMBER OF ELEMENTS IN X AND Y DIRECTIONS
-#Nex = 1000
-#Ney = 1000
+Nex = int(Lx/a)
+Ney = int(Ly/b)
 
 a = 2
 b = 2
@@ -133,7 +138,6 @@ for ii in range(0, 16):
 p0 = np.array([[250], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]])
 
 #DISTRIBUTED LOAD
-
 F_e = np.zeros((16, 1))
 F = []
 po = 1
@@ -148,57 +152,63 @@ for m in range(0, 16):
     F_e[m, 0] = F[m]
 #F_e = (p0*a*b)*np.array([1/4, a/24, b/24, (a*b)/14, 1/4, -a/24, b/24, -(a*b)/144, 1/4, -a/24, -b/24, (a*b)/144, 1/4, a/24, -b/24, -(a*b)/144])
 
-#print(F_e/((p0*a**2)/(d)))
-delta = (K_e**-1)@p0
-#delta = ((K_e**-1)@F_e)
-#print(delta)
-#print((K_e**-1)@p0)
-#print(F_ee)
+#Boundary Conditions
 
-w = N@delta
+resL = np.zeros(3 * (Ney + 1), dtype=int)
+if BCleft == 'S':
+    for i in range(1, Ney+2):
+        resL[3*i-3] = (i-1)*4*(Nex+1) + 1
+        resL[3*i-2] = (i-1)*4*(Nex+1) + 2
+        resL[3*i-1] = (i-1)*4*(Nex+1) + 4
+elif BCleft == 'C':
+    for i in range(1, Ney+2):
+        resL[3*i-3] = (i-1)*4*(Nex+1) + 1
+        resL[3*i-2] = (i-1)*4*(Nex+1) + 2
+        resL[3*i-1] = (i-1)*4*(Nex+1) + 3
+        resL[3*i-1] = (i-1)*4*(Nex+1) + 4
+elif BCleft == 'F':
+    pass
 
-#print(max(delta))
+resR = np.zeros(3 * (Ney + 1), dtype=int)
+if BCright == 'S':
+    for i in range(1, Ney + 2):
+        resR[3*i-3] = i*4*(Nex+1) - 3 
+        resR[3*i-2] = i*4*(Nex+1) - 2
+        resR[3*i-1] = i*4*(Nex+1)
+elif BCright == 'C':
+    for i in range(1, Ney + 2):
+        resR[4*i-4] = i*4*(Nex+1) - 3
+        resR[4*i-3] = i*4*(Nex+1) - 2
+        resR[4*i-2] = i*4*(Nex+1) - 1
+        resR[4*i-1] = i*4*(Nex+1)
+elif BCright == 'F':
+    pass
 
-#def W_dis(x1, y1):
-#    w_evaluated = w[0].subs({x: x1, y: y1}).evalf()
-#    print(w_evaluated)
-#
-#W_dis(2, 2)
-#print(delta)
+resT = np.zeros(3*(Ney + 1), dtype=int)
+if BCtop == 'S':
+    for i in range(1, Nex + 2):
+        resT[3*i-3] = 4*i - 3
+        resT[3*i-2] = 4*i - 1
+        resT[3*i-1] = 4*i
+elif BCtop == 'C':
+    for i in range(1, 4 * (Nex + 1) + 1):
+        resT[i-1] = i
+elif BCtop == 'F':
+    pass
 
 
-# Parameters
-Nex = 2  # Number of elements in the x-direction
-Ney = 2  # Number of elements in the y-direction
-num_dofs = 16  # Number of DOFs per element
+resB = np.zeros(3*(Ney + 1), dtype=int)
+if BCbottom == 'S':
+    for i in range(1, Nex + 2):
+        resB[3*i-3] = 4*i - 3 + 4*(Nex+1)*Ney
+        resB[3*i-2] = 4*i - 1 + 4*(Nex+1)*Ney
+        resB[3*i-1] = 4*i + 4*(Nex+1)*Ney
+elif BCbottom == 'C':
+    for i in range(1, Nex+2):
+        resB[i-1] = i + 4*(Nex+1)*Ney
+elif BCbottom == 'F':
+    pass
 
-# Initialize the code table
-code = np.zeros((Ney * Nex, num_dofs), dtype=int)
+res = np.sort(np.concatenate([resL, resT, resR, resB]))
+res = np.unique(res)
 
-# Outer loop over elements
-for j in range(1, Ney+1):
-    for i in range(1, Nex+1):
-        ne = (j - 1) * Nex + i - 1  # Element number
-        
-        # Assign the DOFs to the code table for each element
-        for k in range(4):
-            code[ne, k] = (j-1)*4*(Nex+1) + 4*(i-1) + k + 1
-            code[ne, k+4] = (j-1)*4*(Nex+1) + 4*i + k + 1
-            code[ne, k+8] = j*4*(Nex+1) + 4*(i-1) + k + 1
-            code[ne, k+12] = j*4*(Nex+1) + 4*i + k + 1
-
-res = np.sort(code.flatten())[::-1]
-size_res = len(res)
-print(code)
-# Perform DOF reduction
-for k in range(size_res-1, -1, -1):  # This simulates the reverse iteration in MATLAB
-    for j in range(Nex * Ney):
-        for i in range(16):
-            if code[j, i] == res[k]:
-                code[j, i] = 0
-            elif code[j, i] > res[k]:
-                code[j, i] -= 1
-
-# Print the modified code table
-print("Code Table after DOF Reduction:")
-print(code)
