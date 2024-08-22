@@ -1,7 +1,7 @@
 clear all
 clc
-Lx=2; Ly=2; h=1; E=10.92; nu=0.3;
-Nex=20; Ney=20; %number of elements in x and y directions
+Lx=4; Ly=4; h=1; E=10.92; nu=0.3;
+Nex=2; Ney=2; %number of elements in x and y directions
 p0=1; ro=7.85;
 BCleft='S'; BCtop='S'; BCright='S'; BCbottom='S';
 %---------------------------SHAPE FUNCTIONS--------------------------------
@@ -48,8 +48,6 @@ for i=1:5
     end
 end
 
-disp((ke^-1)*fe)
-
 %------------RESTRAINED DOFs-----------------------------------------------
 
 if BCleft == 'S'
@@ -72,6 +70,7 @@ end
 if BCleft == 'F'
     resL=[];
 end
+
 if BCtop == 'S'
     for i=1:Nex+1
         resT(3*i-2)=4*i-3;
@@ -87,7 +86,7 @@ if BCtop == 'C'
 end
 
 if BCtop == 'F'
-    rest=[];
+    resT=[];
 end
 
 if BCright == 'S'
@@ -134,7 +133,7 @@ sizeres=size(res);
 for i=1:sizeres(2)-1
     if i<sizeres(2)
         if res(i)==res(i+1)
-            res=[res(1:i),res(i+1:sizeres(2))];
+            res=[res(1:i),res(i+2:sizeres(2))];
             sizeres=size(res);
             i=i-1;
         end
@@ -150,13 +149,14 @@ for j=1:Ney
             code(ne,k)=(j-1)*4*(Nex+1)+4*(i-1)+k;
         end
         for k=1:4
-            code(ne, k+8)=j*4*(Nex+1)+4*(i-1)+k;
+            code(ne,k+8)=j*4*(Nex+1)+4*(i)+k;
         end
         for k=1:4
-            code(ne, k+12)=j*4*(Nex+1)+4*(i-1)+k;
+            code(ne,k+12)=j*4*(Nex+1)+4*(i-1)+k;
         end
     end
 end
+
 sizeres=size(res);
 for k=sizeres(2):-1:1
     for j=1:Nex*Ney
@@ -171,18 +171,22 @@ for k=sizeres(2):-1:1
     end
 end
 
+disp(code)
+
 %---------------------ASSEMBLING-------------------------------------------
 
 K=zeros(max(code(:)), max(code(:)));F=zeros(max(code(:)),1);
 
 for i=1:16
-    if code(i,j)~=0
-        for k=1:16
-            if code(i,k)~=0
-                K(code(i,j), code(i,k))=K(code(i,j),code(i,k))+ke(j,k);
+    for j=1:16
+        if code (i,j) ~=0
+            for k=1:16
+                if code(i,k)~=0
+                    K(code(i,j), code(i,k))=K(code(i,j),code(i,k))+ke(j,k);
+                end
             end
+            F(code(i,j),1)=F(code(i,j),1)+fe(j,1);
         end
-        F(code(i,j),1)=F(code(i,j),1)+fe(j,1);
     end
 end
 
