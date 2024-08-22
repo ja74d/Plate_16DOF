@@ -1,0 +1,21 @@
+{
+"Mesh_SICN_avg": 0.363491,
+"Mesh_SICN_max": 0.699357,
+"Mesh_SICN_med": 0.449089,
+"Mesh_SICN_min": 0.0471028,
+"Mesh_SIGE_avg": 0.597087,
+"Mesh_SIGE_max": 0.876572,
+"Mesh_SIGE_med": 0.62658,
+"Mesh_SIGE_min": 0.180491,
+"Mesh_edge_avg": 2.08725,
+"Mesh_edge_max": 5.5494,
+"Mesh_edge_med": 1.74856,
+"Mesh_edge_min": 0.0162037,
+"Mesh_n_irregular": 4,
+"Mesh_n_quads": 16,
+"Mesh_n_regular": 10,
+"Mesh_n_val3": 4,
+"Mesh_n_val5": 0,
+"Mesh_n_vertices": 21,
+"Mesh_n_very_irregular": 1
+}

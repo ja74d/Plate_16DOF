@@ -85,13 +85,14 @@ for l in range(len(N)):
     BB = np.array([-1*second_diffN_x[l], -1*second_diffN_y[l], -2*second_diffN_xy[l]])
     B.append(BB)
 #B = np.array([B])
+#print(B)
 
 #DIRECT INTEGRATION METHOD
 def K(r, s):
     s = int(s)
     r = int(r)
     fk11 = B[r].T@D@B[s] 
-    k = sp.integrate(sp.integrate(fk11, (x, 2, a)), (y, 2, b))
+    k = sp.integrate(sp.integrate(fk11, (x, 2, 4)), (y, 2, 4))
     return k
 # diret method
 #K_e1 = np.zeros((16, 16))
@@ -100,7 +101,8 @@ def K(r, s):
 #       K_e1[o, p] = K(o, p)
 #
 #print(K_e1)
-
+#print()
+#print(len(K_e1))
 
 # NUMERICAL INTEGRATION METHOD
 ww = [ 0.568889, 0.478629, 0.478629, 0.236927, 0.236927 ]
@@ -123,7 +125,7 @@ for ii in range(0, 16):
                 # Now use the evaluated value in your calculation
                 ke += (a*b/4) * ww[l1] * ww[l2] * fun_evaluated
                 K_e[ii, jj] = ke
-print(K_e)
+#print(K_e)
 
 #F matrix
 
@@ -163,3 +165,40 @@ w = N@delta
 #
 #W_dis(2, 2)
 #print(delta)
+
+
+# Parameters
+Nex = 2  # Number of elements in the x-direction
+Ney = 2  # Number of elements in the y-direction
+num_dofs = 16  # Number of DOFs per element
+
+# Initialize the code table
+code = np.zeros((Ney * Nex, num_dofs), dtype=int)
+
+# Outer loop over elements
+for j in range(1, Ney+1):
+    for i in range(1, Nex+1):
+        ne = (j - 1) * Nex + i - 1  # Element number
+        
+        # Assign the DOFs to the code table for each element
+        for k in range(4):
+            code[ne, k] = (j-1)*4*(Nex+1) + 4*(i-1) + k + 1
+            code[ne, k+4] = (j-1)*4*(Nex+1) + 4*i + k + 1
+            code[ne, k+8] = j*4*(Nex+1) + 4*(i-1) + k + 1
+            code[ne, k+12] = j*4*(Nex+1) + 4*i + k + 1
+
+res = np.sort(code.flatten())[::-1]
+size_res = len(res)
+print(code)
+# Perform DOF reduction
+for k in range(size_res-1, -1, -1):  # This simulates the reverse iteration in MATLAB
+    for j in range(Nex * Ney):
+        for i in range(16):
+            if code[j, i] == res[k]:
+                code[j, i] = 0
+            elif code[j, i] > res[k]:
+                code[j, i] -= 1
+
+# Print the modified code table
+print("Code Table after DOF Reduction:")
+print(code)
