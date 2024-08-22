@@ -212,3 +212,4 @@ elif BCbottom == 'F':
 res = np.sort(np.concatenate([resL, resT, resR, resB]))
 res = np.unique(res)
 
+

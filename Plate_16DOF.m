@@ -1,7 +1,7 @@
 clear all
 clc
-Lx=8; Ly=8; h=1; E=10.92; nu=0.3;
-Nex=4; Ney=4; %number of elements in x and y directions
+Lx=4; Ly=4; h=1; E=10.92; nu=0.3;
+Nex=2; Ney=2; %number of elements in x and y directions
 p0=1; ro=7.85;
 BCleft='S'; BCtop='S'; BCright='S'; BCbottom='S';
 %---------------------------SHAPE FUNCTIONS--------------------------------
@@ -57,6 +57,7 @@ if BCleft == 'S'
         resL(3*i)=(i-1)*4*(Nex+1)+4;
     end
 end
+
 
 if BCleft == 'C'
     for i =1:Ney+1
@@ -140,7 +141,6 @@ for i=1:sizeres(2)-1
     end
 end
 
-
 %-----------------CODE TABLE-----------------------------------------------
 for j=1:Ney
     for i=1:Nex
@@ -171,7 +171,6 @@ for k=sizeres(2):-1:1
     end
 end
 
-disp(code)
 
 %---------------------ASSEMBLING-------------------------------------------
 
