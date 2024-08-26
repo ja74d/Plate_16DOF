@@ -19,7 +19,6 @@ for i in range(0,16,4):
     nd = list(nd)
     El_nodes.append(nd)
 
-
 for  elem_type, elem_tag, elem_nodes in zip(element_types, element_tags, element_node_tags):
     num_nodes_per_elm = len(elem_nodes)//len(elem_tag)
     #print(f"Element Type: {elem_type}, Number of Elements: {len(elem_tag)}")

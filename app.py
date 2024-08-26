@@ -1,6 +1,6 @@
 import numpy as np
 import sympy as sp
-from mesh import El_nodes
+from mesh import El_nodes, node_tags, element_tags
 
 #SYMBOLES
 x, y = sp.symbols('x y')
@@ -209,8 +209,9 @@ res = np.sort(np.concatenate([resL, resT, resR, resB]))
 res = np.unique(res)
 
 #Code Table
-code = np.zeros((Ney * Nex, 16), dtype=int)
-for j in range(1, Ney+1):
+code = np.zeros((len(El_nodes), 16), dtype=int)
+
+for j in range(1, Nex+1):
     for i in range(1, Nex+1):
         ne=(j-1)*Nex+i-1
         for k in range(1, 9):
@@ -235,3 +236,20 @@ for k in range(sizeres - 1, -1, -1):
                 code[j, i] -= 1
 
 #print(code)
+print()
+#print(El_nodes)
+print()
+
+
+
+first_n = (len(node_tags))*(len(code))
+sec_n = []
+for i in range(1, first_n+1):
+    sec_n.append(i)
+
+for i in range()
+print(sec_n[0:int(len(sec_n)/(len(element_tags[1])-1))])
+
+
+
+
