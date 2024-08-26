@@ -1,5 +1,6 @@
 import numpy as np
 import sympy as sp
+from mesh import El_nodes
 
 #SYMBOLES
 x, y = sp.symbols('x y')
@@ -19,10 +20,6 @@ b = 2
 #NUMBER OF ELEMENTS IN X AND Y DIRECTIONS
 Nex = int(Lx/a)
 Ney = int(Ly/b)
-
-a = 2
-b = 2
-
 
 #Hermitian sape functions
 Nx1 = 1-3*(x/a)**2 + 2*(x/a)**3
@@ -165,14 +162,14 @@ elif BCleft == 'C':
         resL[3*i-3] = (i-1)*4*(Nex+1) + 1
         resL[3*i-2] = (i-1)*4*(Nex+1) + 2
         resL[3*i-1] = (i-1)*4*(Nex+1) + 3
-        resL[3*i-1] = (i-1)*4*(Nex+1) + 4
+        resL[3*i] = (i-1)*4*(Nex+1) + 4
 elif BCleft == 'F':
     pass
 
 resR = np.zeros(3 * (Ney + 1), dtype=int)
 if BCright == 'S':
     for i in range(1, Ney + 2):
-        resR[3*i-3] = i*4*(Nex+1) - 3 
+        resR[3*i-3] = i*4*(Nex+1) - 3
         resR[3*i-2] = i*4*(Nex+1) - 2
         resR[3*i-1] = i*4*(Nex+1)
 elif BCright == 'C':
@@ -195,7 +192,6 @@ elif BCtop == 'C':
         resT[i-1] = i
 elif BCtop == 'F':
     pass
-
 
 resB = np.zeros(3*(Ney + 1), dtype=int)
 if BCbottom == 'S':
@@ -226,6 +222,8 @@ for j in range(1, Ney+1):
         for k in range(1, 5):
             code[ne, k + 11] = j * 4 * (Nex + 1) + 4 * (i - 1) + k
 
+#print(code)
+
 sizeres = res.size
 
 for k in range(sizeres - 1, -1, -1):
@@ -235,3 +233,5 @@ for k in range(sizeres - 1, -1, -1):
                 code[j, i] = 0
             elif code[j, i] > res[k]:
                 code[j, i] -= 1
+
+#print(code)
