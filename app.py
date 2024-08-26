@@ -247,8 +247,7 @@ sec_n = []
 for i in range(1, first_n+1):
     sec_n.append(i)
 
-for i in range()
-print(sec_n[0:int(len(sec_n)/(len(element_tags[1])-1))])
+print(sec_n)
 
 
 
