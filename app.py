@@ -223,7 +223,7 @@ for j in range(1, Nex+1):
         for k in range(1, 5):
             code[ne, k + 11] = j * 4 * (Nex + 1) + 4 * (i - 1) + k
 
-#print(code)
+print(code)
 
 sizeres = res.size
 
@@ -235,20 +235,7 @@ for k in range(sizeres - 1, -1, -1):
             elif code[j, i] > res[k]:
                 code[j, i] -= 1
 
-#print(code)
+print(code)
 print()
 #print(El_nodes)
 print()
-
-
-
-first_n = (len(node_tags))*(len(code))
-sec_n = []
-for i in range(1, first_n+1):
-    sec_n.append(i)
-
-print(sec_n)
-
-
-
-

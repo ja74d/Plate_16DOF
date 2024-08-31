@@ -1,43 +1,75 @@
 import numpy as np
 
-# Number of elements in x and y directions
-Nex = 2  # For example, you can change it according to your mesh
-Ney = 2  # For example, you can change it according to your mesh
+num_nodes = 9
+num_dofs_per_node = 4
 
-# Total number of elements
-num_elements = Nex * Ney
+node_dofs = {}
 
-# Number of DOFs per element
-num_dofs = 16
+for node in range(1, num_nodes+1):
+    start_dof = (node-1)*num_dofs_per_node+1
+    node_dofs[node] = list(range(start_dof, start_dof+num_dofs_per_node))
 
-# Initialize the code table
-code = np.zeros((num_elements, num_dofs), dtype=int)
+"""
+{
+ 1: [1, 2, 3, 4],
+ 2: [5, 6, 7, 8],
+ 3: [9, 10, 11, 12],
+ 4: [13, 14, 15, 16],
+ 5: [17, 18, 19, 20],
+ 6: [21, 22, 23, 24],
+ 7: [25, 26, 27, 28],
+ 8: [29, 30, 31, 32],
+ 9: [33, 34, 35, 36]
+}
 
-# Generate the code table directly
+"""
+
+Nex = 2
+Ney = 2
+
+code = np.zeros((Nex*Ney, 16), dtype=int)
+print(code)
+
+num_nodes_x = Nex + 1
+num_nodes_y = Ney + 1
+
+elements = []
+
 for j in range(Ney):
     for i in range(Nex):
-        ne = j * Nex + i  # Element number
-        
-        # Calculate the DOFs for each element and directly populate the `code` table
-        code[ne, 0:4] = [(j * (Nex + 1) + i) * 4 + k + 1 for k in range(4)]
-        code[ne, 4:8] = [(j * (Nex + 1) + (i + 1)) * 4 + k + 1 for k in range(4)]
-        code[ne, 8:12] = [((j + 1) * (Nex + 1) + (i + 1)) * 4 + k + 1 for k in range(4)]
-        code[ne, 12:16] = [((j + 1) * (Nex + 1) + i) * 4 + k + 1 for k in range(4)]
+        n1 = j * num_nodes_x + i + 1
+        n2 = n1 + 1
+        n3 = n1 + num_nodes_x + 1
+        n4 = n1 + num_nodes_x
+        elements.append([n1, n2, n3, n4])
+elements = np.array(elements)
 
+code = []
 
+for i in elements:
+    for j in i:
+        for n in node_dofs[j]:
+            code.append(n)
 
-res = np.sort(code.flatten())[::-1]
-size_res = len(res)
-
-# Perform DOF reduction
-for k in range(size_res-1, -1, -1):  # This simulates the reverse iteration in MATLAB
-    for j in range(Nex * Ney):
-        for i in range(16):
-            if code[j, i] == res[k]:
-                code[j, i] = 0
-            elif code[j, i] > res[k]:
-                code[j, i] -= 1
-
-# Print the modified code table
-print("Code Table after DOF Reduction:")
+def split_into_groups(lst, num_groups=4):
+    # Calculate the size of each group
+    n = len(lst)
+    group_size = n // num_groups
+    remainder = n % num_groups
+    
+    # Create the result list of lists
+    groups = []
+    
+    start = 0
+    for i in range(num_groups):
+        # Determine the end index for the current group
+        end = start + group_size + (1 if i < remainder else 0)
+        # Append the current group to the result list
+        groups.append(lst[start:end])
+        # Update the start index for the next group
+        start = end
+    
+    return groups
+code = split_into_groups(code)
+code = np.array(code)
 print(code)
