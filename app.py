@@ -1,6 +1,7 @@
 import numpy as np
 import sympy as sp
 from mesh import El_nodes, node_tags, element_tags
+from code_table import code_table
 
 #SYMBOLES
 x, y = sp.symbols('x y')
@@ -209,22 +210,24 @@ res = np.sort(np.concatenate([resL, resT, resR, resB]))
 res = np.unique(res)
 
 #Code Table
-code = np.zeros((len(El_nodes), 16), dtype=int)
+#code = np.zeros((len(El_nodes), 16), dtype=int)
 
-for j in range(1, Nex+1):
-    for i in range(1, Nex+1):
-        ne=(j-1)*Nex+i-1
-        for k in range(1, 9):
-            code[ne, k-1] = (j - 1) * 4 * (Nex + 1) + 4 * (i - 1) + k
-        for k in range(1, 5):
-            code[ne, k + 7] = j * 4 * (Nex + 1) + 4 * i + k
-        
-        # Third loop (k = 1:4)
-        for k in range(1, 5):
-            code[ne, k + 11] = j * 4 * (Nex + 1) + 4 * (i - 1) + k
-
+#for j in range(1, Nex+1):
+#    for i in range(1, Nex+1):
+#        ne=(j-1)*Nex+i-1
+#        for k in range(1, 9):
+#            code[ne, k-1] = (j - 1) * 4 * (Nex + 1) + 4 * (i - 1) + k
+#        for k in range(1, 5):
+#            code[ne, k + 7] = j * 4 * (Nex + 1) + 4 * i + k
+#        
+#        # Third loop (k = 1:4)
+#        for k in range(1, 5):
+#            code[ne, k + 11] = j * 4 * (Nex + 1) + 4 * (i - 1) + k
+#
+#print(code)
+#
+code = code_table(2, 2)
 print(code)
-
 sizeres = res.size
 
 for k in range(sizeres - 1, -1, -1):
