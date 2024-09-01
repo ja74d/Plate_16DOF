@@ -226,8 +226,8 @@ res = np.unique(res)
 #
 #print(code)
 #
-code = code_table(2, 2)
-print(code)
+code = code_table(Nex, Ney)
+
 sizeres = res.size
 
 for k in range(sizeres - 1, -1, -1):
@@ -237,8 +237,3 @@ for k in range(sizeres - 1, -1, -1):
                 code[j, i] = 0
             elif code[j, i] > res[k]:
                 code[j, i] -= 1
-
-print(code)
-print()
-#print(El_nodes)
-print()
