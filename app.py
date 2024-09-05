@@ -251,8 +251,6 @@ for elem in range(num_elements):
 
 Delta = np.linalg.inv(K) @ F
 
-x, y = symbols('x y')
-
 midelem = int(np.fix(Ney / 2) * Nex + np.fix(Nex / 2) + 1)
 
 corXmid = (Nex / 2 - np.fix(Nex / 2)) * a
@@ -268,5 +266,6 @@ for i in range(16):
 wmidND = Wmid / (po * Lx**4 / d)
 
 # Output the result
-print(f"Wmid (displacement at midpoint): {Wmid}")
-print(f"Non-dimensional Wmid (wmidND): {wmidND}")
+print(f"number of elements: {Nex*Ney}")
+print(f"displacement at midpoint: {Wmid}")
+print(f"Non-dimensional displacement at midpoint: {wmidND}")

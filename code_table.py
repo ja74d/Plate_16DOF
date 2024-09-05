@@ -1,8 +1,8 @@
 import numpy as np
 from collections import Counter
 
-Nex = 64
-Ney = 64
+Nex = 4
+Ney = 4
 
 num_nodes = (Nex+1)*(Ney+1)
 node_dofs = {}
