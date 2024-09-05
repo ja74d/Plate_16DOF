@@ -1,7 +1,7 @@
 import numpy as np
 import sympy as sp
 from mesh import El_nodes, node_tags, element_tags
-from code_table import code_table
+from code_table import code, Nex, Ney
 
 #SYMBOLES
 x, y = sp.symbols('x y')
@@ -19,8 +19,8 @@ a = 2
 b = 2
 
 #NUMBER OF ELEMENTS IN X AND Y DIRECTIONS
-Nex = int(Lx/a)
-Ney = int(Ly/b)
+#Nex = int(Lx/a)
+#Ney = int(Ly/b)
 
 #Hermitian sape functions
 Nx1 = 1-3*(x/a)**2 + 2*(x/a)**3
@@ -133,7 +133,7 @@ for ii in range(0, 16):
 #F matrix
 
 #POINT LOAD
-p0 = np.array([[250], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]])
+#F_e = np.array([[250], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]])
 
 #DISTRIBUTED LOAD
 F_e = np.zeros((16, 1))
@@ -151,7 +151,6 @@ for m in range(0, 16):
 #F_e = (p0*a*b)*np.array([1/4, a/24, b/24, (a*b)/14, 1/4, -a/24, b/24, -(a*b)/144, 1/4, -a/24, -b/24, (a*b)/144, 1/4, a/24, -b/24, -(a*b)/144])
 
 #Boundary Conditions
-
 resL = np.zeros(3 * (Ney + 1), dtype=int)
 if BCleft == 'S':
     for i in range(1, Ney+2):
@@ -166,6 +165,8 @@ elif BCleft == 'C':
         resL[3*i] = (i-1)*4*(Nex+1) + 4
 elif BCleft == 'F':
     pass
+
+#print(resL)
 
 resR = np.zeros(3 * (Ney + 1), dtype=int)
 if BCright == 'S':
@@ -182,6 +183,8 @@ elif BCright == 'C':
 elif BCright == 'F':
     pass
 
+#print(resR)
+
 resT = np.zeros(3*(Ney + 1), dtype=int)
 if BCtop == 'S':
     for i in range(1, Nex + 2):
@@ -193,6 +196,8 @@ elif BCtop == 'C':
         resT[i-1] = i
 elif BCtop == 'F':
     pass
+
+#print(resT)
 
 resB = np.zeros(3*(Ney + 1), dtype=int)
 if BCbottom == 'S':
@@ -206,29 +211,16 @@ elif BCbottom == 'C':
 elif BCbottom == 'F':
     pass
 
+#print(resB)
+
 res = np.sort(np.concatenate([resL, resT, resR, resB]))
 res = np.unique(res)
 
-#Code Table
-#code = np.zeros((len(El_nodes), 16), dtype=int)
-
-#for j in range(1, Nex+1):
-#    for i in range(1, Nex+1):
-#        ne=(j-1)*Nex+i-1
-#        for k in range(1, 9):
-#            code[ne, k-1] = (j - 1) * 4 * (Nex + 1) + 4 * (i - 1) + k
-#        for k in range(1, 5):
-#            code[ne, k + 7] = j * 4 * (Nex + 1) + 4 * i + k
-#        
-#        # Third loop (k = 1:4)
-#        for k in range(1, 5):
-#            code[ne, k + 11] = j * 4 * (Nex + 1) + 4 * (i - 1) + k
-#
-#print(code)
-#
-code = code_table(Nex, Ney)
+#code = code_table(Nex, Ney)
 
 sizeres = res.size
+
+#print(code)
 
 for k in range(sizeres - 1, -1, -1):
     for j in range(Nex * Ney):
@@ -237,3 +229,24 @@ for k in range(sizeres - 1, -1, -1):
                 code[j, i] = 0
             elif code[j, i] > res[k]:
                 code[j, i] -= 1
+
+num_dofs = np.max(code)
+
+# Initialize the global stiffness matrix and force vector
+K = np.zeros((num_dofs, num_dofs))
+F = np.zeros(num_dofs)
+
+# Loop over all elements
+num_elements = code.shape[0]  # Number of elements
+for elem in range(num_elements):
+    for i in range(16):
+        if code[elem, i] != 0:  # If the DOF is not restrained
+            for j in range(16):
+                if code[elem, j] != 0:  # If the DOF is not restrained
+                    # Assemble the global stiffness matrix
+                    K[code[elem, i] - 1, code[elem, j] - 1] += K_e[i, j]  # Adjusting for zero-based indexing
+            # Assemble the global force vector
+            F[code[elem, i] - 1] += F_e[i, 0] 
+
+Delta = np.linalg.inv(K) @ F
+

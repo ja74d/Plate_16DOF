@@ -33,7 +33,7 @@ def code_table(Nex, Ney):
         for node in element:
             element_dofs.extend(node_dofs[node])
         code[i, :] = element_dofs
-    
+    print(element_dofs)
     
     return code
 code_table(2, 2)
