@@ -1,29 +1,12 @@
 import numpy as np
 import sympy as sp
+from input import *
 from sympy import symbols
 #from mesh import El_nodes, node_tags, element_tags
-from code_table import code, Nex, Ney
+from code_table import code
 
 #SYMBOLES
 x, y = sp.symbols('x y')
-
-BCleft, BCright, BCtop, BCbottom = 'S', 'S', 'S', 'S'
-
-#Number of elements in x and y directions
-
-#Nex = 8
-#Ney = 8
-
-#PLATE PROPERTIES
-nu = 0.3
-E = 1
-h = 1
-Lx = 8
-Ly = 8
-
-a = Lx/Nex
-b = Ly/Ney
-
 
 #Hermitian sape functions
 Nx1 = 1-3*(x/a)**2 + 2*(x/a)**3
@@ -134,18 +117,12 @@ for ii in range(0, 16):
 #print(K_e)
 
 #F matrix
-
-#POINT LOAD
-#F_e = np.array([[250], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0]])
-
 #DISTRIBUTED LOAD
 F_e = np.zeros((16, 1))
 F = []
-po = 1
 
 for bb in range(0, 16):
     N = N.T
-    #NN = sp.diff(N[bb], y)
     f = sp.integrate(sp.integrate(po*N[bb], (x, 0, a)), (y, 0, b))
     F.append(f)
 
@@ -153,7 +130,7 @@ for m in range(0, 16):
     F_e[m, 0] = F[m]
 #F_e = (p0*a*b)*np.array([1/4, a/24, b/24, (a*b)/14, 1/4, -a/24, b/24, -(a*b)/144, 1/4, -a/24, -b/24, (a*b)/144, 1/4, a/24, -b/24, -(a*b)/144])
 
-#Boundary Conditions
+#EFFECT OF BOUNDARY CONDITIONS ON DOFs
 resL = np.zeros(3 * (Ney + 1), dtype=int)
 if BCleft == 'S':
     for i in range(1, Ney+2):
@@ -169,12 +146,12 @@ elif BCleft == 'C':
 elif BCleft == 'F':
     pass
 
-#print(resL)
-
 resR = np.zeros(3 * (Ney + 1), dtype=int)
 if BCright == 'S':
     for i in range(1, Ney + 2):
         resR[3*i-3] = i*4*(Nex+1) - 3
+
+
         resR[3*i-2] = i*4*(Nex+1) - 2
         resR[3*i-1] = i*4*(Nex+1)
 elif BCright == 'C':
@@ -185,8 +162,6 @@ elif BCright == 'C':
         resR[4*i-1] = i*4*(Nex+1)
 elif BCright == 'F':
     pass
-
-#print(resR)
 
 resT = np.zeros(3*(Ney + 1), dtype=int)
 if BCtop == 'S':
@@ -200,8 +175,6 @@ elif BCtop == 'C':
 elif BCtop == 'F':
     pass
 
-#print(resT)
-
 resB = np.zeros(3*(Ney + 1), dtype=int)
 if BCbottom == 'S':
     for i in range(1, Nex + 2):
@@ -214,16 +187,10 @@ elif BCbottom == 'C':
 elif BCbottom == 'F':
     pass
 
-#print(resB)
-
 res = np.sort(np.concatenate([resL, resT, resR, resB]))
 res = np.unique(res)
 
-#code = code_table(Nex, Ney)
-
 sizeres = res.size
-
-#print(code)
 
 for k in range(sizeres - 1, -1, -1):
     for j in range(Nex * Ney):
@@ -257,12 +224,11 @@ corXmid = (Nex / 2 - np.fix(Nex / 2)) * a
 corYmid = (Ney / 2 - np.fix(Ney / 2)) * b
 
 Wmid = 0
-
 for i in range(16):
     if code[midelem - 1, i] != 0:  # Zero-based indexing in Python
         Wmid += float(N[i].subs(x, corXmid).subs(y, corYmid) * Delta[code[midelem - 1, i] - 1])
 
-#non-dimentional
+#NON-DIMENTIONAL DISPLACEMENT
 wmidND = Wmid / (po * Lx**4 / d)
 
 # Output the result
