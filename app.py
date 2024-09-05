@@ -1,6 +1,7 @@
 import numpy as np
 import sympy as sp
-from mesh import El_nodes, node_tags, element_tags
+from sympy import symbols
+#from mesh import El_nodes, node_tags, element_tags
 from code_table import code, Nex, Ney
 
 #SYMBOLES
@@ -8,19 +9,21 @@ x, y = sp.symbols('x y')
 
 BCleft, BCright, BCtop, BCbottom = 'S', 'S', 'S', 'S'
 
+#Number of elements in x and y directions
+
+#Nex = 8
+#Ney = 8
+
 #PLATE PROPERTIES
 nu = 0.3
 E = 1
 h = 1
-Lx = 4
-Ly = 4
+Lx = 8
+Ly = 8
 
-a = 2
-b = 2
+a = Lx/Nex
+b = Ly/Ney
 
-#NUMBER OF ELEMENTS IN X AND Y DIRECTIONS
-#Nex = int(Lx/a)
-#Ney = int(Ly/b)
 
 #Hermitian sape functions
 Nx1 = 1-3*(x/a)**2 + 2*(x/a)**3
@@ -230,23 +233,40 @@ for k in range(sizeres - 1, -1, -1):
             elif code[j, i] > res[k]:
                 code[j, i] -= 1
 
+#Assembling
 num_dofs = np.max(code)
 
-# Initialize the global stiffness matrix and force vector
 K = np.zeros((num_dofs, num_dofs))
 F = np.zeros(num_dofs)
 
-# Loop over all elements
-num_elements = code.shape[0]  # Number of elements
+num_elements = code.shape[0]
+
 for elem in range(num_elements):
     for i in range(16):
-        if code[elem, i] != 0:  # If the DOF is not restrained
+        if code[elem, i] != 0:
             for j in range(16):
-                if code[elem, j] != 0:  # If the DOF is not restrained
-                    # Assemble the global stiffness matrix
-                    K[code[elem, i] - 1, code[elem, j] - 1] += K_e[i, j]  # Adjusting for zero-based indexing
-            # Assemble the global force vector
-            F[code[elem, i] - 1] += F_e[i, 0] 
+                if code[elem, j] != 0:
+                    K[code[elem, i] - 1, code[elem, j] - 1] += K_e[i, j]
+            F[code[elem, i] - 1] += F_e[i, 0]
 
 Delta = np.linalg.inv(K) @ F
 
+x, y = symbols('x y')
+
+midelem = int(np.fix(Ney / 2) * Nex + np.fix(Nex / 2) + 1)
+
+corXmid = (Nex / 2 - np.fix(Nex / 2)) * a
+corYmid = (Ney / 2 - np.fix(Ney / 2)) * b
+
+Wmid = 0
+
+for i in range(16):
+    if code[midelem - 1, i] != 0:  # Zero-based indexing in Python
+        Wmid += float(N[i].subs(x, corXmid).subs(y, corYmid) * Delta[code[midelem - 1, i] - 1])
+
+#non-dimentional
+wmidND = Wmid / (po * Lx**4 / d)
+
+# Output the result
+print(f"Wmid (displacement at midpoint): {Wmid}")
+print(f"Non-dimensional Wmid (wmidND): {wmidND}")
