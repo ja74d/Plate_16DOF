@@ -1,8 +1,6 @@
 import numpy as np
 import sympy as sp
 from input import *
-from sympy import symbols
-#from mesh import El_nodes, node_tags, element_tags
 from code_table import code
 
 #SYMBOLES

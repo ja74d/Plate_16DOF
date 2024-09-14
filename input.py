@@ -1,6 +1,6 @@
 #NUMBER OF ELEMENTS
-Nex = 8
-Ney = 8
+Nex = 60
+Ney = 60
 
 #PLATE PROPERTIES
 nu = 0.3
