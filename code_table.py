@@ -60,7 +60,7 @@ if BCright == 'S':
         resR.append(i[3])
         
 elif BCright == 'C':
-    for i in range(1, Ney + 2):
+    for i in right_dofs:
         resR.append(i[0])
         resR.append(i[1])
         resR.append(i[2])
