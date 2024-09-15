@@ -1,6 +1,8 @@
+#from mesh import Nex, Ney
+
 #NUMBER OF ELEMENTS
-Nex = 60
-Ney = 60
+#Nex = 32
+#Ney = 32
 
 #PLATE PROPERTIES
 nu = 0.3
@@ -8,9 +10,6 @@ E = 1
 h = 1
 Lx = 8
 Ly = 8
-
-a = Lx/Nex
-b = Ly/Ney
 
 #BOUNDARY CONDITIONS
 BCleft, BCright, BCtop, BCbottom = 'S', 'S', 'S', 'S'

@@ -1,6 +1,7 @@
 import numpy as np
 import sympy as sp
 from input import *
+from mesh import Nex, Ney, a, b
 from code_table import code
 
 #SYMBOLES
@@ -106,10 +107,7 @@ for ii in range(0, 16):
                 x1 = 0.5*xx[l1]*a + 0.5*a
                 y1 = 0.5*xx[l2]*b + 0.5*b
 
-                # Apply the substitution and evaluate the expression
                 fun_evaluated = fun.subs({x: x1, y: y1}).evalf()
-
-                # Now use the evaluated value in your calculation
                 ke += (a*b/4) * ww[l1] * ww[l2] * fun_evaluated
                 K_e[ii, jj] = ke
 #print(K_e)
@@ -127,76 +125,6 @@ for bb in range(0, 16):
 for m in range(0, 16):
     F_e[m, 0] = F[m]
 #F_e = (p0*a*b)*np.array([1/4, a/24, b/24, (a*b)/14, 1/4, -a/24, b/24, -(a*b)/144, 1/4, -a/24, -b/24, (a*b)/144, 1/4, a/24, -b/24, -(a*b)/144])
-
-#EFFECT OF BOUNDARY CONDITIONS ON DOFs
-resL = np.zeros(3 * (Ney + 1), dtype=int)
-if BCleft == 'S':
-    for i in range(1, Ney+2):
-        resL[3*i-3] = (i-1)*4*(Nex+1) + 1
-        resL[3*i-2] = (i-1)*4*(Nex+1) + 2
-        resL[3*i-1] = (i-1)*4*(Nex+1) + 4
-elif BCleft == 'C':
-    for i in range(1, Ney+2):
-        resL[3*i-3] = (i-1)*4*(Nex+1) + 1
-        resL[3*i-2] = (i-1)*4*(Nex+1) + 2
-        resL[3*i-1] = (i-1)*4*(Nex+1) + 3
-        resL[3*i] = (i-1)*4*(Nex+1) + 4
-elif BCleft == 'F':
-    pass
-
-resR = np.zeros(3 * (Ney + 1), dtype=int)
-if BCright == 'S':
-    for i in range(1, Ney + 2):
-        resR[3*i-3] = i*4*(Nex+1) - 3
-
-
-        resR[3*i-2] = i*4*(Nex+1) - 2
-        resR[3*i-1] = i*4*(Nex+1)
-elif BCright == 'C':
-    for i in range(1, Ney + 2):
-        resR[4*i-4] = i*4*(Nex+1) - 3
-        resR[4*i-3] = i*4*(Nex+1) - 2
-        resR[4*i-2] = i*4*(Nex+1) - 1
-        resR[4*i-1] = i*4*(Nex+1)
-elif BCright == 'F':
-    pass
-
-resT = np.zeros(3*(Ney + 1), dtype=int)
-if BCtop == 'S':
-    for i in range(1, Nex + 2):
-        resT[3*i-3] = 4*i - 3
-        resT[3*i-2] = 4*i - 1
-        resT[3*i-1] = 4*i
-elif BCtop == 'C':
-    for i in range(1, 4 * (Nex + 1) + 1):
-        resT[i-1] = i
-elif BCtop == 'F':
-    pass
-
-resB = np.zeros(3*(Ney + 1), dtype=int)
-if BCbottom == 'S':
-    for i in range(1, Nex + 2):
-        resB[3*i-3] = 4*i - 3 + 4*(Nex+1)*Ney
-        resB[3*i-2] = 4*i - 1 + 4*(Nex+1)*Ney
-        resB[3*i-1] = 4*i + 4*(Nex+1)*Ney
-elif BCbottom == 'C':
-    for i in range(1, Nex+2):
-        resB[i-1] = i + 4*(Nex+1)*Ney
-elif BCbottom == 'F':
-    pass
-
-res = np.sort(np.concatenate([resL, resT, resR, resB]))
-res = np.unique(res)
-
-sizeres = res.size
-
-for k in range(sizeres - 1, -1, -1):
-    for j in range(Nex * Ney):
-        for i in range(16):
-            if code[j, i] == res[k]:
-                code[j, i] = 0
-            elif code[j, i] > res[k]:
-                code[j, i] -= 1
 
 #Assembling
 num_dofs = np.max(code)
@@ -220,6 +148,7 @@ midelem = int(np.fix(Ney / 2) * Nex + np.fix(Nex / 2) + 1)
 
 corXmid = (Nex / 2 - np.fix(Nex / 2)) * a
 corYmid = (Ney / 2 - np.fix(Ney / 2)) * b
+
 
 Wmid = 0
 for i in range(16):

@@ -1,4 +1,5 @@
 import gmsh
+from input import *
 import numpy as np
 
 gmsh.initialize()
@@ -23,6 +24,8 @@ node_per_element = node_tages_per_element[1].reshape(-1, 4)
 Nel = len(node_per_element)
 
 #Physical group--for B.C.
+# This part of the code findes the Boundary Nodes
+
 boundary_nodes_by_name1 = {}
 boundary_nodes_by_name2 = {}
 
@@ -61,6 +64,35 @@ Boundary = {}
 for key in set(boundary_nodes_by_name1.keys()).union(boundary_nodes_by_name2.keys()):
     Boundary[key] = boundary_nodes_by_name1.get(key, []) + boundary_nodes_by_name2.get(key, [])
 
-print(Boundary)
+#DOFs for each edge of the plate
+left_dofs = []
+for i in Boundary['Left']:
+    L = [int(4*i-3), int(4*i-2), int(4*i-1), int(4*i)]
+    left_dofs.append(L)
+
+right_dofs = []
+for i in Boundary['Right']:
+    R = [int(4*i-3), int(4*i-2), int(4*i-1), int(4*i)]
+    right_dofs.append(R)
+
+top_dofs = []
+for i in Boundary['Top']:
+    T = [ int(4*i-3), int(4*i-2), int(4*i-1), int(4*i) ]
+    top_dofs.append(T)
+
+bottom_dofs = []
+for i in Boundary['Bottom']:
+    B = [ int(4*i-3), int(4*i-2), int(4*i-1), int(4*i) ]
+    bottom_dofs.append(B)
+
+elements = np.array(node_per_element)
+
+#numbr of elements in x and y direction
+Nex = len(Boundary['Left']) - 1
+Ney = len(Boundary['Top']) - 1
+
+a = Lx/Nex
+b = Ly/Ney
+
 
 gmsh.finalize()

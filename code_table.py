@@ -1,26 +1,32 @@
 import numpy as np
-from input import Nex, Ney
+from mesh import Nex, Ney, elements, left_dofs, right_dofs, top_dofs, bottom_dofs
+from input import *
 from collections import Counter
 
 
 num_nodes = (Nex+1)*(Ney+1)
 node_dofs = {}
 
+#This loop gives every node, its DOFs without considering its Boundary Conditions
 for node in range(1, num_nodes+1):
     start_dof = (node-1)*4+1
     node_dofs[node] = list(range(start_dof, start_dof+4))
 
-code = np.zeros((Nex*Ney, 16), dtype=int)
-elements = []
 
-for j in range(Ney):
-    for i in range(Nex):
-        n1 = j * (Nex+1) + i + 1
-        n2 = n1 + 1
-        n3 = n1 + (Nex+1) + 1
-        n4 = n1 + (Nex+1)
-        elements.append([n1, n2, n3, n4])
-elements = np.array(elements)
+code = np.zeros((Nex*Ney, 16), dtype=int)
+#elements = []
+
+#In case of Using GMSH module for Mesh generation, this part of the code is not nesseserry
+#for j in range(Ney):
+#    for i in range(Nex):
+#        n1 = j * (Nex+1) + i + 1
+#        n2 = n1 + 1
+#        n3 = n1 + (Nex+1) + 1
+#        n4 = n1 + (Nex+1)
+#        elements.append([n1, n2, n3, n4])
+#elements = np.array(elements)
+
+
 code = np.zeros((len(elements), 16), dtype=int)
 
 # Fill the code table
@@ -30,30 +36,84 @@ for i, element in enumerate(elements):
         element_dofs.extend(node_dofs[node])
     code[i, :] = element_dofs
 
+#EFFECT OF BOUNDARY CONDITIONS ON DOFs
+resL = []
+if BCleft == 'S':
+    for i in left_dofs:
+        resL.append(i[0])
+        resL.append(i[1])
+        resL.append(i[3])
+elif BCleft == 'C':
+    for i in left_dofs:
+        resL.append(i[0])
+        resL.append(i[1])
+        resL.append(i[2])
+        resL.append(i[3])
+elif BCleft == 'F':
+    pass
 
-all_nodes = [node for element in elements for node in element]
-node_counts = Counter(all_nodes)
-    
-edge_nodes = list({ node for node, count in node_counts.items() if count==1 })
-edge_nodes2 = list({ node for node, count in node_counts.items() if count==2 })
-boundary_nodes = []
-for i in edge_nodes:
-    boundary_nodes.append(i)
-for j in edge_nodes2:
-    boundary_nodes.append(j)
+resR = []
+if BCright == 'S':
+    for i in right_dofs:
+        resR.append(i[0])
+        resR.append(i[1])
+        resR.append(i[3])
+        
+elif BCright == 'C':
+    for i in range(1, Ney + 2):
+        resR.append(i[0])
+        resR.append(i[1])
+        resR.append(i[2])
+        resR.append(i[3])
+elif BCright == 'F':
+    pass
 
-boundary_nodes = sorted(boundary_nodes)
+resT = []
+if BCtop == 'S':
+    for i in top_dofs:
+        resT.append(i[0])
+        resT.append(i[2])
+        resT.append(i[3])
+elif BCtop == 'C':
+    for i in top_dofs:
+        resT.append(i[0])
+        resT.append(i[1])
+        resT.append(i[2])
+        resT.append(i[3])
+elif BCtop == 'F':
+    pass
 
-#boundary nodes at each node
-top_nodes = boundary_nodes[0:Ney+1]
-bottom_nodes = boundary_nodes[-(Ney+1):]
+resB = []
+if BCbottom == 'S':
+    for i in bottom_dofs:
+        resB.append(i[0])
+        resB.append(i[2])
+        resB.append(i[3])
+elif BCbottom == 'C':
+    for i in bottom_dofs:
+        resB.append(i[0])
+        resB.append(i[1])
+        resB.append(i[2])
+        resB.append(i[3])
+elif BCbottom == 'F':
+    pass
 
-left_nodes = []
-for i in range(1, Nex+2):
-    left_nodes.append( (Nex+1)*(i-1)+1 )
+#converting lists to numpy arrays
+resT = np.array(resT)
+resR = np.array(resR)
+resB = np.array(resB)
+resL = np.array(resL)
 
 
-right_nodes = []
-for i in range(1, Nex+2):
-    right_nodes.append( (Nex+1)*i )
+res = np.sort(np.concatenate([resL, resT, resR, resB]))
+res = np.unique(res)
 
+sizeres = res.size
+
+for k in range(sizeres - 1, -1, -1):
+    for j in range(Nex * Ney):
+        for i in range(16):
+            if code[j, i] == res[k]:
+                code[j, i] = 0
+            elif code[j, i] > res[k]:
+                code[j, i] -= 1
