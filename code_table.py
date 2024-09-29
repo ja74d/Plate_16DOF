@@ -110,10 +110,13 @@ res = np.unique(res)
 
 sizeres = res.size
 
+#print(code)
+
 for k in range(sizeres - 1, -1, -1):
-    for j in range(Nex * Ney):
+    for j in range(len(elements)):
         for i in range(16):
             if code[j, i] == res[k]:
                 code[j, i] = 0
             elif code[j, i] > res[k]:
                 code[j, i] -= 1
+

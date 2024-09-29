@@ -73,7 +73,6 @@ for l in range(len(N)):
     BB = np.array([-1*second_diffN_x[l], -1*second_diffN_y[l], -2*second_diffN_xy[l]])
     B.append(BB)
 #B = np.array([B])
-#print(B)
 
 #DIRECT INTEGRATION METHOD
 def K(r, s):
