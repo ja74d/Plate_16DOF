@@ -15,7 +15,7 @@ node_tags, node_coords, _ = gmsh.model.mesh.getNodes()
 #Elements info
 element_types, element_tags, node_tages_per_element = gmsh.model.mesh.getElements()
 node_coords = node_coords.reshape((-1, 3))
-print(node_coords)
+#print(node_coords)
 # rectangular elements are specified by "element_tags[1]"
 
 # A list that contains lists of nodes for each elemete

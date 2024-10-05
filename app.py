@@ -3,6 +3,7 @@ import sympy as sp
 from input import *
 from mesh import Nex, Ney, a, b
 from code_table import code
+from scipy.linalg import eig
 
 #SYMBOLES
 x, y = sp.symbols('x y')
@@ -96,19 +97,25 @@ ww = [ 0.568889, 0.478629, 0.478629, 0.236927, 0.236927 ]
 xx = [ 0, 0.538469, -0.538469, 0.90618, -0.90618 ]
 
 K_e = np.zeros([16, 16])
+K_gxe = np.zeros([16, 16])
 
 for ii in range(0, 16):
     for jj in range(0, 16):
         fun = B[ii].T @ D @ B[jj]
+        fun2 = sp.diff(N[ii], x)*sp.diff(N[jj], x)
         ke=0
+        kgxe=0
         for l1 in range(0, 5):
             for l2 in range(0, 5):
                 x1 = 0.5*xx[l1]*a + 0.5*a
                 y1 = 0.5*xx[l2]*b + 0.5*b
 
                 fun_evaluated = fun.subs({x: x1, y: y1}).evalf()
+                fun_evaluated2 = fun2.subs({x: x1, y: y1}).evalf()
                 ke += (a*b/4) * ww[l1] * ww[l2] * fun_evaluated
+                kgxe += (a*b/4)* ww[l1] * ww[l2] * fun_evaluated2
                 K_e[ii, jj] = ke
+                K_gxe[ii,jj] = kgxe
 #print(K_e)
 
 #F matrix
@@ -129,6 +136,7 @@ for m in range(0, 16):
 num_dofs = np.max(code)
 
 K = np.zeros((num_dofs, num_dofs))
+Kgx = np.zeros((num_dofs, num_dofs))
 F = np.zeros(num_dofs)
 
 num_elements = code.shape[0]
@@ -139,9 +147,13 @@ for elem in range(num_elements):
             for j in range(16):
                 if code[elem, j] != 0:
                     K[code[elem, i] - 1, code[elem, j] - 1] += K_e[i, j]
+                    Kgx[code[elem, i] - 1, code[elem, j] - 1] += K_gxe[i, j]
             F[code[elem, i] - 1] += F_e[i, 0]
 
 Delta = np.linalg.inv(K) @ F
+
+#eigenvalues, eigenvectors = eig(K, Kgx)
+#print(min(eigenvalues))
 
 midelem = int(np.fix(Ney / 2) * Nex + np.fix(Nex / 2) + 1)
 

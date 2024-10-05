@@ -8,8 +8,8 @@
 nu = 0.3
 E = 1
 h = 1
-Lx = 8
-Ly = 8
+Lx = 16
+Ly = 16
 
 #BOUNDARY CONDITIONS
 BCleft, BCright, BCtop, BCbottom = 'S', 'S', 'S', 'S'
