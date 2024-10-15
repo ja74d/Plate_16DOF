@@ -98,11 +98,12 @@ xx = [ 0, 0.538469, -0.538469, 0.90618, -0.90618 ]
 
 K_e = np.zeros([16, 16])
 K_gxe = np.zeros([16, 16])
+K_gye = np.zeros([16, 16])
 
 for ii in range(0, 16):
     for jj in range(0, 16):
         fun = B[ii].T @ D @ B[jj]
-        fun2 = sp.diff(N[ii], x)*sp.diff(N[jj], x)
+        fungx = sp.diff(N[ii], x)*sp.diff(N[jj], x)
         ke=0
         kgxe=0
         for l1 in range(0, 5):
@@ -111,13 +112,12 @@ for ii in range(0, 16):
                 y1 = 0.5*xx[l2]*b + 0.5*b
 
                 fun_evaluated = fun.subs({x: x1, y: y1}).evalf()
-                fun_evaluated2 = fun2.subs({x: x1, y: y1}).evalf()
+                fun_evaluatedgx = fungx.subs({x: x1, y: y1}).evalf()
                 ke += (a*b/4) * ww[l1] * ww[l2] * fun_evaluated
-                kgxe += (a*b/4)* ww[l1] * ww[l2] * fun_evaluated2
+                kgxe += (a*b/4)* ww[l1] * ww[l2] * fun_evaluatedgx
                 K_e[ii, jj] = ke
                 K_gxe[ii,jj] = kgxe
 #print(K_e)
-
 #F matrix
 #DISTRIBUTED LOAD
 F_e = np.zeros((16, 1))
@@ -152,8 +152,8 @@ for elem in range(num_elements):
 
 Delta = np.linalg.inv(K) @ F
 
-#eigenvalues, eigenvectors = eig(K, Kgx)
-#print(min(eigenvalues))
+eigenvaluesx, eigenvectorsx = eig(K, Kgx)
+#print(eigenvalues)
 
 midelem = int(np.fix(Ney / 2) * Nex + np.fix(Nex / 2) + 1)
 
@@ -168,8 +168,10 @@ for i in range(16):
 
 #NON-DIMENTIONAL DISPLACEMENT
 wmidND = Wmid / (po * Lx**4 / d)
+#wmidND = Wmid*((E*h**3)/(Lx**4*po))
 
 # Output the result
 print(f"number of elements: {Nex*Ney}")
 print(f"displacement at midpoint: {Wmid}")
 print(f"Non-dimensional displacement at midpoint: {wmidND}")
+print('landa: ',min(eigenvaluesx))
