@@ -104,8 +104,10 @@ for ii in range(0, 16):
     for jj in range(0, 16):
         fun = B[ii].T @ D @ B[jj]
         fungx = sp.diff(N[ii], x)*sp.diff(N[jj], x)
+        fungy = sp.diff(N[ii], y)*sp.diff(N[jj], y)
         ke=0
         kgxe=0
+        kgye=0
         for l1 in range(0, 5):
             for l2 in range(0, 5):
                 x1 = 0.5*xx[l1]*a + 0.5*a
@@ -113,10 +115,13 @@ for ii in range(0, 16):
 
                 fun_evaluated = fun.subs({x: x1, y: y1}).evalf()
                 fun_evaluatedgx = fungx.subs({x: x1, y: y1}).evalf()
+                fun_evaluatedgy = fungy.subs({x: x1, y: y1}).evalf()
                 ke += (a*b/4) * ww[l1] * ww[l2] * fun_evaluated
                 kgxe += (a*b/4)* ww[l1] * ww[l2] * fun_evaluatedgx
+                kgye += (a*b/4)* ww[l1] * ww[l2] * fun_evaluatedgy
                 K_e[ii, jj] = ke
-                K_gxe[ii,jj] = kgxe
+                K_gxe[ii, jj] = kgxe
+                K_gye[ii, jj] = kgye
 #print(K_e)
 #F matrix
 #DISTRIBUTED LOAD
@@ -137,6 +142,7 @@ num_dofs = np.max(code)
 
 K = np.zeros((num_dofs, num_dofs))
 Kgx = np.zeros((num_dofs, num_dofs))
+Kgy = np.zeros((num_dofs, num_dofs))
 F = np.zeros(num_dofs)
 
 num_elements = code.shape[0]
@@ -148,11 +154,13 @@ for elem in range(num_elements):
                 if code[elem, j] != 0:
                     K[code[elem, i] - 1, code[elem, j] - 1] += K_e[i, j]
                     Kgx[code[elem, i] - 1, code[elem, j] - 1] += K_gxe[i, j]
+                    Kgy[code[elem, i] - 1, code[elem, j] - 1] += K_gye[i, j]
             F[code[elem, i] - 1] += F_e[i, 0]
 
 Delta = np.linalg.inv(K) @ F
 
 eigenvaluesx, eigenvectorsx = eig(K, Kgx)
+eigenvaluesy, eigenvectorsy = eig(K, Kgy)
 #print(eigenvalues)
 
 midelem = int(np.fix(Ney / 2) * Nex + np.fix(Nex / 2) + 1)
@@ -174,4 +182,4 @@ wmidND = Wmid / (po * Lx**4 / d)
 print(f"number of elements: {Nex*Ney}")
 print(f"displacement at midpoint: {Wmid}")
 print(f"Non-dimensional displacement at midpoint: {wmidND}")
-print('landa: ',min(eigenvaluesx))
+print('landa: ',min(eigenvaluesy))
