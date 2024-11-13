@@ -119,4 +119,5 @@ for k in range(sizeres - 1, -1, -1):
                 code[j, i] = 0
             elif code[j, i] > res[k]:
                 code[j, i] -= 1
+#print(code)
 

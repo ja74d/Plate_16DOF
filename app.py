@@ -1,3 +1,4 @@
+import math
 import numpy as np
 import sympy as sp
 from input import *
@@ -153,15 +154,19 @@ for elem in range(num_elements):
             for j in range(16):
                 if code[elem, j] != 0:
                     K[code[elem, i] - 1, code[elem, j] - 1] += K_e[i, j]
-                    Kgx[code[elem, i] - 1, code[elem, j] - 1] += K_gxe[i, j]
-                    Kgy[code[elem, i] - 1, code[elem, j] - 1] += K_gye[i, j]
+                    #Kgx[code[elem, i] - 1, code[elem, j] - 1] += K_gxe[i, j]
+                    #Kgy[code[elem, i] - 1, code[elem, j] - 1] += K_gye[i, j]
             F[code[elem, i] - 1] += F_e[i, 0]
 
 Delta = np.linalg.inv(K) @ F
 
-eigenvaluesx, eigenvectorsx = eig(K, Kgx)
-eigenvaluesy, eigenvectorsy = eig(K, Kgy)
+#eigenvaluesx, eigenvectorsx = eig(K, Kgx)
+#eigenvaluesy, eigenvectorsy = eig(K, Kgy)
 #print(eigenvalues)
+#Load Factor
+
+#ncr = float(min(eigenvaluesx))
+#ncr = ncr.real
 
 midelem = int(np.fix(Ney / 2) * Nex + np.fix(Nex / 2) + 1)
 
@@ -182,4 +187,11 @@ wmidND = Wmid / (po * Lx**4 / d)
 print(f"number of elements: {Nex*Ney}")
 print(f"displacement at midpoint: {Wmid}")
 print(f"Non-dimensional displacement at midpoint: {wmidND}")
-print('landa: ',min(eigenvaluesy))
+#print('critical load: ',ncr)
+#print(Delta)
+
+#Displacement Based on element number and node number
+element = 2
+node = 2
+
+#print(Delta[code[element-1][4*node-4]-1])
