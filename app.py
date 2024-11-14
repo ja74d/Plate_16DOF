@@ -1,4 +1,6 @@
 import math
+import h5py
+import pandas as pd
 import numpy as np
 import sympy as sp
 from input import *
@@ -191,7 +193,25 @@ print(f"Non-dimensional displacement at midpoint: {wmidND}")
 #print(Delta)
 
 #Displacement Based on element number and node number
-element = 2
-node = 2
 
-#print(Delta[code[element-1][4*node-4]-1])
+
+#print(Delta)
+#Delta = Delta / (po * Lx**4 / d)
+
+# Create an HDF5 file
+with h5py.File(f'({file_name}).h5', 'w') as hdf:
+
+    # Create a group for matrices
+    matrices_group = hdf.create_group('Matrices')
+    matrices_group.create_dataset('Stiffness_Matrix', data=K)
+    matrices_group.create_dataset('Force_Matrix', data=F)
+
+    # Create a group for nodal data
+    nodal_group = hdf.create_group('Nodal_Data')
+    nodal_group.create_dataset('Nodal_Displacement', data=Delta)
+
+    # You can also add attributes for metadata
+    hdf.attrs['Description'] = 'Finite Element Analysis Results'
+    hdf.attrs['Version'] = '1.0'
+
+print(f"Data has been saved in '{file_name}.h5'")

@@ -1,5 +1,5 @@
 import numpy as np
-from mesh import Nex, Ney, elements, left_dofs, right_dofs, top_dofs, bottom_dofs
+from mesh import Nex, Ney, elements, left_dofs, right_dofs, top_dofs, bottom_dofs, node_coords, node_per_element
 from input import *
 from collections import Counter
 
@@ -121,3 +121,14 @@ for k in range(sizeres - 1, -1, -1):
                 code[j, i] -= 1
 #print(code)
 
+nodal_coor = node_coords.reshape(-1,3)
+num_nodes = len(nodal_coor)
+
+
+coordinations = []
+
+for i in node_per_element:
+    for j in range(0, 4):
+        coordinations.append(nodal_coor[int(i[j]-1)])
+
+coordinations = [coordinations[i:i+4] for i in range(0, len(coordinations), 4)]
